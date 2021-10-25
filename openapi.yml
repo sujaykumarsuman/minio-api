@@ -1,0 +1,149 @@
+openapi: '3.0.2'
+info:
+  title: minio-api
+  description: "A client API for MinIO servers"
+  version: '0.0.1'
+  contact:
+    name: "Sujay Kumar Suman"
+    url: "https://sujaykumarsuman.github.io"
+    email: "sujaykumar.dev@gmail.com"
+servers:
+  - url: localhost:8080
+    description: Local test server
+tags:
+  - name: "Bucket Operation"
+    description: "Endpoints to handle operations on buckets"
+  # - name: "Object Operation"
+  #   description: "Endpoints to handle operations on objects in a bucket"
+paths:
+  /bucket:
+    get:
+      operationId: "ListBuckets"
+      summary: "Returns a list of buckets"
+      tags:
+        - "Bucket Operation"
+      parameters: []
+      responses:
+        '200':
+          description: "Successfully returns a list of Buckets in a MinIO server"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bucket"
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResp"
+  /bucket/{name}:
+    get:
+      operationId: "ListObjects"
+      summary: "Returns a list of objects in a bucket"
+      tags:
+        - "Bucket Operation"
+      parameters:
+        - in: path
+          name: "name"
+          schema:
+            type: string
+          required: true
+          description: "Name of the bucket"
+      responses:
+        '200':
+          description: "Successfully returns list of objects in a bucket"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Object"
+        '404':
+          description: "Bucket not found"
+        '500':
+          description: "Internal Server Error"
+    post:
+      operationId: "CreateBucket"
+      summary: "Creates a new bucket"
+      tags:
+        - "Bucket Operation"
+      parameters:
+        - in: path
+          name: "name"
+          schema:
+            type: string
+          required: true
+          description: "Name of the bucket"
+      responses:
+        '200':
+          description: "Successfully created a new bucket"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResp"
+        '403':
+          description: "Invalid request"
+        '500':
+          description: "Internal Server Error"
+    delete:
+      operationId: "RemoveBucket"
+      summary: "Removes an existing bucket"
+      tags:
+        - "Bucket Operation"
+      parameters:
+        - in: path
+          name: "name"
+          schema:
+            type: string
+          required: true
+          description: "Name of the bucket"
+      responses:
+        '200':
+          description: "Successfully deleted an existing bucket"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResp"
+        '403':
+          description: "Invalid request"
+        '404':
+          description: "Bucket not found"
+        '500':
+          description: "Internal Server Error"
+
+components:
+  schemas:
+    ApiResp:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+      required:
+        - "status"
+        - "message"
+    Bucket:
+      type: object
+      properties:
+        bucket_name:
+          type: string
+        creation_date:
+          type: string
+      required:
+        - "bucket_name"
+        - "creation_date"
+    Object:
+      type: object
+      properties:
+        key:
+          type: string
+        size:
+          type: integer
+        e_tag:
+          type: string
+        last_modified:
+          type: string
+    
