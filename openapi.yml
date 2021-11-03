@@ -16,7 +16,7 @@ tags:
   # - name: "Object Operation"
   #   description: "Endpoints to handle operations on objects in a bucket"
 paths:
-  /bucket:
+  /buckets:
     get:
       operationId: "ListBuckets"
       summary: "Returns a list of buckets"
@@ -38,7 +38,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResp"
-  /bucket/{name}:
+  /buckets/{name}:
     get:
       operationId: "ListObjects"
       summary: "Returns a list of objects in a bucket"
