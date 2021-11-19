@@ -95,3 +95,75 @@ func S3ListObjects(s3Client *s3.S3, bucketName string) *s3.ListObjectsV2Output {
 
 	return result
 }
+
+func S3PutBucketLifeCycle(s3Client *s3.S3, bucketName string) (*s3.PutBucketLifecycleConfigurationOutput, error) {
+	ruleID := fmt.Sprintf("%s-expire", bucketName)
+	deleteMarkRuleID := "Delete Marker"
+	input := &s3.PutBucketLifecycleConfigurationInput{
+		Bucket: aws.String(bucketName),
+		LifecycleConfiguration: &s3.BucketLifecycleConfiguration{
+			Rules: []*s3.LifecycleRule{
+				{
+					Status: aws.String("Enabled"),
+					Expiration: &s3.LifecycleExpiration{
+						Days: aws.Int64(2),
+					},
+					ID: &ruleID,
+					Filter: &s3.LifecycleRuleFilter{
+						Prefix: aws.String(""),
+					},
+					NoncurrentVersionExpiration: &s3.NoncurrentVersionExpiration{
+						NoncurrentDays: aws.Int64(2),
+					},
+				},
+				{
+					Status: aws.String("Enabled"),
+					Expiration: &s3.LifecycleExpiration{
+						ExpiredObjectDeleteMarker: aws.Bool(true),
+					},
+					ID: &deleteMarkRuleID,
+					Filter: &s3.LifecycleRuleFilter{
+						Prefix: aws.String(""),
+					},
+				},
+			},
+		},
+	}
+	fmt.Println("PutBucketLifecycle")
+	result, err := s3Client.PutBucketLifecycleConfiguration(input)
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			default:
+				fmt.Println(aerr.Error())
+			}
+		} else {
+			fmt.Println(err.Error())
+		}
+		return nil, err
+	}
+	return result, nil
+}
+
+func S3GetBucketLifecycle(s3Client *s3.S3, bucketName string) (*s3.GetBucketLifecycleConfigurationOutput, error) {
+	input := &s3.GetBucketLifecycleConfigurationInput{
+		Bucket: &bucketName,
+	}
+
+	result, err := s3Client.GetBucketLifecycleConfiguration(input)
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			default:
+				fmt.Println(aerr.Error())
+			}
+		} else {
+			// Print the error, cast err to awserr.Error to get the Code and
+			// Message from an error.
+			fmt.Println(err.Error())
+		}
+		return nil, err
+	}
+
+	return result, nil
+}
