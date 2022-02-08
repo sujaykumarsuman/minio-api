@@ -1,0 +1,41 @@
+version: '2.4'
+services:
+  minio:
+    image: minio/minio:latest
+    mem_limit: 1024m
+    hostname: minio
+    container_name: minio
+    command: server /data
+    ports:
+      - "9000:9000"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    healthcheck:
+      test: curl -f http://127.0.0.1:9000/minio/health/live
+      interval: 30s
+      timeout: 20s
+      retries: 10
+    networks:
+      - minio-net
+  minio-api:
+    image: sujaykumarsuman/minio-api
+    depends_on:
+      minio:
+        condition: service_healthy
+    mem_limit: 512m
+    hostname: minio-api
+    container_name: minio-api
+    command: /minio-api
+    environment:
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    ports:
+      - "8080:8080"
+    networks:
+      - minio-net
+
+networks:
+  minio-net:
+    driver: bridge
+    name: minio-net
