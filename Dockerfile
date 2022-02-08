@@ -1,4 +1,4 @@
-FROM golang:1.16-alpine
+FROM golang:1.17.0-alpine3.14
 
 WORKDIR /go/src/github.com/sujaykumarsuman/minio-api
 

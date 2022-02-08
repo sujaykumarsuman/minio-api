@@ -1,12 +1,15 @@
 package main
 
-import "minio-api/pkg/server"
+import (
+	"minio-api/pkg/server"
+	"os"
+)
 
 func main() {
 	// MinIO server config
-	endpoint := "localhost:9000"
-	accessKeyID := "minio_test_db"
-	secretAccessKey := "sujaykumarsuman"
+	endpoint := "minio:9000"
+	accessKeyID := os.Getenv("MINIO_ACCESS_KEY")
+	secretAccessKey := os.Getenv("MINIO_SECRET_KEY")
 
 	// Start minio-api server
 	server.StartServer(endpoint, accessKeyID, secretAccessKey)

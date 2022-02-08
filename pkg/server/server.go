@@ -16,7 +16,7 @@ import (
 
 func StartServer(endpoint, accessKeyID, secretAccessKey string) {
 	apiServer := controller.GetMinioClient(endpoint, accessKeyID, secretAccessKey)
-	HOST := "localhost"
+	HOST := "0.0.0.0"
 	PORT := 8080
 	mux := chi.NewMux()
 	mux.Use(middleware.Logger)
